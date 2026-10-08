@@ -1,0 +1,78 @@
+{
+  "index_patterns": ["ai-audit-logs-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index.refresh_interval": "1s"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "event": {
+          "properties": {
+            "id": { "type": "keyword" },
+            "action": { "type": "keyword" },
+            "category": { "type": "keyword" },
+            "outcome": { "type": "keyword" }
+          }
+        },
+        "user": {
+          "properties": {
+            "name": { "type": "keyword" },
+            "email": { "type": "keyword" },
+            "role": { "type": "keyword" },
+            "department": { "type": "keyword" },
+            "cost_center": { "type": "keyword" }
+          }
+        },
+        "ai": {
+          "properties": {
+            "model": { "type": "keyword" },
+            "provider": { "type": "keyword" },
+            "tokens": {
+              "properties": {
+                "prompt": { "type": "long" },
+                "completion": { "type": "long" },
+                "total": { "type": "long" }
+              }
+            },
+            "cost_usd": { "type": "float" },
+            "latency_ms": { "type": "float" },
+            "status_code": { "type": "integer" },
+            "prompt_text": {
+              "type": "text",
+              "fields": {
+                "keyword": { "type": "keyword", "ignore_above": 1024 }
+              }
+            },
+            "response_text": {
+              "type": "text",
+              "fields": {
+                "keyword": { "type": "keyword", "ignore_above": 1024 }
+              }
+            }
+          }
+        },
+        "network": {
+          "properties": {
+            "client_ip": { "type": "ip" },
+            "destination_host": { "type": "keyword" },
+            "protocol": { "type": "keyword" },
+            "user_agent": { "type": "keyword" }
+          }
+        },
+        "security": {
+          "properties": {
+            "is_alert": { "type": "boolean" },
+            "rule_name": { "type": "keyword" },
+            "severity": { "type": "keyword" },
+            "owasp_category": { "type": "keyword" },
+            "mitre_atlas_technique": { "type": "keyword" },
+            "matched_pattern": { "type": "keyword" }
+          }
+        }
+      }
+    }
+  }
+}
