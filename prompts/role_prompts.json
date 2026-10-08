@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "description": "Role-based prompt templates for AI Usage Monitoring Lab. Each role maps to a department user, their assigned model, a system prompt defining AI behaviour, and a list of realistic task prompts. Used by simulate_traffic.py to generate authenticated, role-appropriate inference requests tracked by the SIEM.",
+  "roles": {
+    "role_dev": {
+      "user": "alice.dev",
+      "model": "dev-code-llm",
+      "department": "Engineering",
+      "cost_center": "CC-ENG-401",
+      "system_prompt": "You are a secure development assistant for the Engineering department. You assist developers in writing auditable, secure code following OWASP guidelines, identifying vulnerabilities, and building security automation tooling. All code recommendations must comply with corporate secure coding standards. Never suggest insecure patterns, hardcoded credentials, or unvalidated inputs.",
+      "prompts": [
+        {
+          "id": "DEV_001",
+          "category": "secure_coding",
+          "description": "JWT validation implementation",
+          "content": "Write a Python function to safely validate JSON Web Tokens using the PyJWT library with RS256 algorithm. Include JWKS endpoint verification and expiry checks."
+        },
+        {
+          "id": "DEV_002",
+          "category": "vulnerability_remediation",
+          "description": "SQL injection remediation",
+          "content": "Refactor this SQL query to eliminate injection risk using parameterized statements: SELECT * FROM users WHERE username = [input] AND password = [input]. Add input sanitisation and a query execution audit log."
+        },
+        {
+          "id": "DEV_003",
+          "category": "security_automation",
+          "description": "ECS alert parser for SIEM triage",
+          "content": "Write a Python script to parse Elasticsearch ECS-format security alert JSON and extract the fields: user.name, ai.model, security.severity, security.owasp_category, and security.mitre_atlas_technique for automated SOC triage."
+        },
+        {
+          "id": "DEV_004",
+          "category": "threat_detection",
+          "description": "Prompt injection detection utility",
+          "content": "Write a Python function using regex to detect common prompt injection patterns in user-submitted AI prompts: DAN mode attempts, jailbreak instructions, system prompt extraction commands, and role override sequences."
+        }
+      ]
+    },
+    "role_finance": {
+      "user": "bob.finance",
+      "model": "financial-analyzer-llm",
+      "department": "Finance",
+      "cost_center": "CC-FIN-102",
+      "system_prompt": "You are a financial risk and compliance analyst assistant for the Finance department. You provide financial forecasting, fraud pattern analysis, variance reporting, and regulatory compliance guidance. All sensitive financial data must be anonymised before submission. Do not process or store raw PAN, SSN, or account credentials.",
+      "prompts": [
+        {
+          "id": "FIN_001",
+          "category": "financial_analysis",
+          "description": "NPV calculation with discount rate",
+          "content": "Calculate the Net Present Value (NPV) for a 5-year capital investment of £2.4M with projected annual cash flows of £620K, £710K, £830K, £950K, £1.1M at a discount rate of 7.5%."
+        },
+        {
+          "id": "FIN_002",
+          "category": "variance_reporting",
+          "description": "Q3 OPEX variance summary",
+          "content": "Summarise the Q3 budget variance: OPEX was £1.24M against a budget of £1.05M. Break down the overspend by category (headcount, infrastructure, licensing) and recommend corrective actions."
+        },
+        {
+          "id": "FIN_003",
+          "category": "fraud_detection",
+          "description": "Anomalous transaction pattern review",
+          "content": "Analyse this pattern of internal transfers: three transactions of £9,800 each from CC-CONTRACT-999 to external accounts within a 4-hour window. Flag anomalies against our AML policy thresholds and recommend escalation steps."
+        },
+        {
+          "id": "FIN_004",
+          "category": "compliance_reporting",
+          "description": "AI cost governance report",
+          "content": "Generate a monthly AI usage cost summary report for the Finance department. Include: total tokens consumed, estimated cost in USD, model breakdown, and comparison against the £500/month departmental AI budget ceiling."
+        }
+      ]
+    },
+    "role_hr": {
+      "user": "carol.hr",
+      "model": "hr-assistant-llm",
+      "department": "Human Resources",
+      "cost_center": "CC-HR-809",
+      "system_prompt": "You are a People Operations and HR compliance assistant for the Human Resources department. You provide guidance on employment policy, security awareness training content, background screening procedures, and incident reporting workflows. Responses must align with UK employment law, GDPR data subject rights, and corporate security policy. Never process raw personal identifiers, financial data, or health records.",
+      "prompts": [
+        {
+          "id": "HR_001",
+          "category": "job_description",
+          "description": "Senior Cloud Security Engineer JD",
+          "content": "Draft a job description for a Senior Cloud Security Engineer role. Include: responsibilities for SIEM management, AI security governance, identity and access management (IAM), and threat detection engineering. Required qualifications: SC-900, AZ-500 or equivalent, 5+ years in cloud security."
+        },
+        {
+          "id": "HR_002",
+          "category": "policy_guidance",
+          "description": "UK maternity and paternity leave entitlements",
+          "content": "Summarise UK statutory maternity leave entitlements and how they interact with our enhanced company policy of 26 weeks full pay. Include the paternity leave and shared parental leave provisions."
+        },
+        {
+          "id": "HR_003",
+          "category": "security_awareness",
+          "description": "AI acceptable use policy summary for employees",
+          "content": "Draft a concise AI Acceptable Use Policy summary for employee onboarding. Cover: approved AI tools, prohibited uses (PII submission, secret leakage, shadow AI), reporting obligations, and disciplinary consequences for violations."
+        },
+        {
+          "id": "HR_004",
+          "category": "incident_reporting",
+          "description": "Data breach notification procedure",
+          "content": "What is the step-by-step HR procedure when an employee reports that they accidentally submitted personally identifiable information (PII) to an external AI chatbot? Include GDPR notification timelines and line manager escalation steps."
+        }
+      ]
+    }
+  }
+}
