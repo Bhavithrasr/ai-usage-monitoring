@@ -1,4 +1,4 @@
-# 🛡️ Enterprise AI Usage Monitoring & Security Operations Lab (Flagship Project)
+# 🛡️ Enterprise AI Usage Monitoring & Security Operations Lab
 
 [![Windows](https://img.shields.io/badge/Platform-Windows%20(native)-0078D6?logo=windows&logoColor=white)](#)
 [![LiteLLM](https://img.shields.io/badge/AI%20Gateway-LiteLLM%20Proxy-4F46E5)](#)
