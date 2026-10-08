@@ -1,0 +1,23 @@
+title: Anomalous Off-Hours AI Inference Activity
+id: a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d
+status: experimental
+description: Detects high-frequency AI inference occurring between 01:00 and 05:00 UTC, which may indicate automated bot scraping, unauthorized scripts, or account takeover.
+references:
+  - https://atlas.mitre.org/techniques/AML.T0012/
+author: Bhavithra SR
+date: 2026/09/30
+tags:
+  - attack.initial_access
+  - attack.persistence
+  - owasp.llm06
+  - mitre.atlas.aml.t0012
+logsource:
+  category: application
+  product: litellm_ai_gateway
+detection:
+  selection:
+    security.rule_name: 'OFF_HOURS_ACCESS'
+  condition: selection
+falsepositives:
+  - Night-shift operations personnel or authorized automated CI/CD pipelines
+level: medium

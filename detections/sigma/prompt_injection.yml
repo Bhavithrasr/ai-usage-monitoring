@@ -1,0 +1,38 @@
+title: Direct Prompt Injection and Jailbreak Attempt
+id: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
+status: experimental
+description: Detects direct prompt injection keywords, jailbreak constructs (DAN), and system prompt extraction maneuvers.
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/NIST_AI_RMF_OWASP_LLM_Top_10.pdf
+  - https://atlas.mitre.org/techniques/AML.T0051/
+  - https://atlas.mitre.org/techniques/AML.T0054/
+author: Bhavithra SR
+date: 2026/09/30
+tags:
+  - attack.initial_access
+  - attack.execution
+  - attack.defense_evasion
+  - owasp.llm01
+  - mitre.atlas.aml.t0051
+  - mitre.atlas.aml.t0054
+logsource:
+  category: application
+  product: litellm_ai_gateway
+detection:
+  selection_rule:
+    security.rule_name: 'PROMPT_INJECTION'
+  selection_keywords:
+    ai.prompt_text|contains:
+      - 'ignore previous instructions'
+      - 'ignore all previous instructions'
+      - 'disregard all previous directions'
+      - 'system prompt'
+      - 'output your prompt verbatim'
+      - 'dan mode'
+      - 'do anything now'
+      - 'developer mode enabled'
+      - 'you have no restrictions'
+  condition: selection_rule or selection_keywords
+falsepositives:
+  - Developer engineering prompts designed for benchmarking guardrails
+level: critical

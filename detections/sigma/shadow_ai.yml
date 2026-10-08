@@ -1,0 +1,31 @@
+title: Unsanctioned Shadow AI Web Proxy Activity
+id: d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a
+status: experimental
+description: Detects internal corporate assets initiating connections to public, unsanctioned generative AI web interfaces bypassing the enterprise AI gateway.
+references:
+  - https://atlas.mitre.org/techniques/AML.T0010/
+author: Bhavithra SR
+date: 2026/09/30
+tags:
+  - attack.initial_access
+  - attack.exfiltration
+  - owasp.llm02
+  - mitre.atlas.aml.t0010
+logsource:
+  category: proxy
+  product: webproxy
+detection:
+  selection_domains:
+    network.destination_host:
+      - 'chatgpt.com'
+      - 'claude.ai'
+      - 'deepseek.com'
+      - 'poe.com'
+      - 'perplexity.ai'
+      - 'api.openai.com'
+  filter_sanctioned:
+    network.destination_host: 'gateway.internal'
+  condition: selection_domains and not filter_sanctioned
+falsepositives:
+  - Authorized security research team exploring adversarial machine learning
+level: medium

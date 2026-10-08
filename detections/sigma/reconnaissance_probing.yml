@@ -1,0 +1,27 @@
+title: AI Gateway Endpoint Reconnaissance and Fuzzing
+id: b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e
+status: experimental
+description: Detects an abnormal spike in client-side errors (400 Bad Request, 401 Unauthorized, 403 Forbidden, 429 Rate Limit) indicative of automated parameter fuzzing or reconnaissance.
+references:
+  - https://atlas.mitre.org/techniques/AML.T0002/
+author: Bhavithra SR
+date: 2026/09/30
+tags:
+  - attack.discovery
+  - owasp.llm01
+  - owasp.llm04
+  - mitre.atlas.aml.t0002
+logsource:
+  category: application
+  product: litellm_ai_gateway
+detection:
+  selection_errors:
+    ai.status_code:
+      - 400
+      - 401
+      - 403
+      - 429
+  condition: selection_errors
+falsepositives:
+  - Malformed client integration during early development
+level: low

@@ -1,0 +1,28 @@
+title: AI Inference Large Bulk Data Exfiltration
+id: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
+status: experimental
+description: Detects abnormally large prompt token submissions indicative of confidential document pasting, source code dump, or exfiltration.
+references:
+  - https://atlas.mitre.org/techniques/AML.T0024/
+  - https://atlas.mitre.org/techniques/AML.T0029/
+author: Bhavithra SR
+date: 2026/09/30
+tags:
+  - attack.exfiltration
+  - attack.impact
+  - owasp.llm02
+  - owasp.llm04
+  - mitre.atlas.aml.t0024
+  - mitre.atlas.aml.t0029
+logsource:
+  category: application
+  product: litellm_ai_gateway
+detection:
+  selection_rule:
+    security.rule_name: 'BULK_DATA_EXFILTRATION'
+  selection_tokens:
+    ai.tokens.prompt|gte: 4000
+  condition: selection_rule or selection_tokens
+falsepositives:
+  - Authorized large legal contracts or extensive code repo audits by authorized senior personnel
+level: high

@@ -1,0 +1,110 @@
+# ==============================================================================
+# Elastic SIEM / Kibana Detection Rules
+# Project: AI Usage Monitoring Lab (Flagship)
+# Format: Kibana Query Language (KQL) and Lucene (for rules that need regex)
+# Data view: ai-audit-logs*   (id: ai-audit-logs-pattern)
+#
+# These are the queries deployed to the Elastic Security detection engine by
+# scripts/create_elastic_rules.py. Keep the two in sync.
+#
+# Notes:
+#   - KQL has no regex support, so rules 1 and 6 use Lucene syntax.
+#   - Exact-match fields use the .keyword sub-field; free-text matching uses
+#     the analysed ai.prompt_text field (tokens are lower-cased).
+#   - ai.prompt_text.keyword is only indexed for prompts <= 256 characters
+#     (dynamic-mapping default), so rule 1 also matches PII keywords in text.
+#   - Rule 7 uses the runtime field event.hour_of_day defined on the data view:
+#       emit(doc['@timestamp'].value.getHour())
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Rule 1: Personal Identifiable Information (PII) Leakage in Prompts
+# Rule ID: ai-lab-01-pii-in-prompt
+# Language: Lucene
+# OWASP LLM: LLM02 (Sensitive Information Disclosure)
+# MITRE ATLAS: AML.T0024 (Exfiltration via ML Inference)
+# Severity: High
+# Description: Credit card numbers, SSNs or PII keywords submitted in a prompt
+# ------------------------------------------------------------------------------
+ai.prompt_text.keyword:/.*[0-9]{4}[- ][0-9]{4}[- ][0-9]{4}[- ][0-9]{4}.*/ OR ai.prompt_text.keyword:/.*[0-9]{3}-[0-9]{2}-[0-9]{4}.*/ OR ai.prompt_text:("SSN" OR "card number" OR "CVV")
+
+# ------------------------------------------------------------------------------
+# Rule 2: Bulk Data Upload / Exfiltration Burst
+# Rule ID: ai-lab-02-bulk-exfiltration
+# Language: KQL
+# OWASP LLM: LLM02 (Sensitive Information Disclosure) & LLM04 (Model DoS)
+# MITRE ATLAS: AML.T0024 (Exfiltration) & AML.T0029 (Denial of ML Service)
+# Severity: High
+# Description: Single prompt exceeding 4,000 tokens (document / database dump)
+# ------------------------------------------------------------------------------
+ai.tokens.prompt > 4000
+
+# ------------------------------------------------------------------------------
+# Rule 3: Unauthorized Model Access (RBAC Violation)
+# Rule ID: ai-lab-03-rbac-violation
+# Language: KQL
+# OWASP LLM: LLM06 (Insecure Authorization / Excessive Agency)
+# MITRE ATLAS: AML.T0012 (Valid Accounts) & AML.T0016 (Obtain Capabilities)
+# Severity: Medium
+# Description: Identity calls a model outside its assigned role, or gateway returns 403
+# ------------------------------------------------------------------------------
+ai.status_code : 403 or (user.role.keyword : ("role_hr" or "role_finance") and ai.model.keyword : "dev-code-llm") or (user.role.keyword : "role_hr" and ai.model.keyword : "financial-analyzer-llm")
+
+# ------------------------------------------------------------------------------
+# Rule 4: Shadow AI Access via Proxy / DNS Logs
+# Rule ID: ai-lab-04-shadow-ai
+# Language: KQL
+# OWASP LLM: LLM02 (Sensitive Information Disclosure / Governance Bypass)
+# MITRE ATLAS: AML.T0010 (ML Supply Chain Compromise / Evasion)
+# Severity: Medium
+# Description: Direct connections to public AI services bypassing the corporate gateway
+# ------------------------------------------------------------------------------
+network.destination_host.keyword : ("chatgpt.com" or "chat.openai.com" or "api.openai.com" or "claude.ai" or "deepseek.com" or "poe.com" or "perplexity.ai" or "gemini.google.com")
+
+# ------------------------------------------------------------------------------
+# Rule 5: Direct Prompt Injection & Jailbreak Attempts
+# Rule ID: ai-lab-05-prompt-injection
+# Language: KQL
+# OWASP LLM: LLM01 (Prompt Injection)
+# MITRE ATLAS: AML.T0051 (LLM Prompt Injection) & AML.T0054 (LLM Jailbreak)
+# Severity: Critical
+# Description: DAN, instruction override, or system prompt extraction phrasing
+# Known false positive: developers writing detection code that mentions these
+# phrases (e.g. "detect DAN mode attempts, jailbreak instructions...").
+# ------------------------------------------------------------------------------
+ai.prompt_text : ("ignore previous instructions" or "ignore all previous instructions" or "ignore all instructions" or "system prompt" or "DAN mode" or "do anything now" or "jailbreak" or "bypass rules" or "developer mode enabled" or "verbatim" or "disregard guidelines" or "disregard all")
+
+# ------------------------------------------------------------------------------
+# Rule 6: Credential & Secret Leakage in Prompts
+# Rule ID: ai-lab-06-secret-leakage
+# Language: Lucene
+# OWASP LLM: LLM02 (Sensitive Information Disclosure)
+# MITRE ATLAS: AML.T0048 (Discover ML Model Artifacts / Data Exfiltration)
+# Severity: Critical
+# Description: AWS access keys, GitHub tokens, and private key material
+# (regex runs against lower-cased analysed tokens, hence akia / ghp_)
+# ------------------------------------------------------------------------------
+ai.prompt_text:/akia[0-9a-z]{16}/ OR ai.prompt_text:/ghp_[0-9a-z]{36}/ OR ai.prompt_text:"PRIVATE KEY"
+
+# ------------------------------------------------------------------------------
+# Rule 7: Off-Hours / Anomalous Usage
+# Rule ID: ai-lab-07-off-hours
+# Language: KQL
+# OWASP LLM: LLM06 (Insecure Authorization / Account Compromise)
+# MITRE ATLAS: AML.T0012 (Valid Accounts)
+# Severity: Medium
+# Description: Inference requests between 01:00 and 05:00 UTC
+# Requires runtime field event.hour_of_day on the data view (see header).
+# ------------------------------------------------------------------------------
+event.hour_of_day >= 1 and event.hour_of_day < 5
+
+# ------------------------------------------------------------------------------
+# Rule 8: Reconnaissance & Excessive Client Errors
+# Rule ID: ai-lab-08-recon-errors
+# Language: KQL
+# OWASP LLM: LLM01 (Prompt Injection) & LLM04 (Model DoS)
+# MITRE ATLAS: AML.T0002 (ML Model Discovery / Reconnaissance)
+# Severity: Medium
+# Description: 400/401/403/429 responses from the AI gateway (overlaps rule 3 on 403)
+# ------------------------------------------------------------------------------
+ai.status_code : (400 or 401 or 403 or 429)
