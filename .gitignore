@@ -1,0 +1,50 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.venv-*/
+
+# Docker volumes & persistent data
+esdata/
+pgdata/
+kcdata/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# start_lab.ps1 process tracking
+.lab_pids
+
+# Local scratch test (not part of the lab)
+test_prisma.py
+
+# Docker Compose version (planned - kept locally, not published yet)
+docker-compose.yml
+scripts/setup_lab.sh
+config/mock_ai/Dockerfile
+
+# Microsoft Sentinel / Azure integration (planned - kept locally, not published yet)
+scripts/sentinel_forwarder.py
+detections/rules_sentinel.kql
+dashboards/sentinel_workbook.json
