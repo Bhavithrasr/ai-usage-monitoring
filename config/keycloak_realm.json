@@ -1,0 +1,237 @@
+{
+  "realm": "ai-sec-realm",
+  "enabled": true,
+  "displayName": "AI Security & Governance Realm",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "role_dev",
+        "description": "Software Engineering & Dev Team with access to code models"
+      },
+      {
+        "name": "role_finance",
+        "description": "Finance & Accounting Team with access to financial models"
+      },
+      {
+        "name": "role_hr",
+        "description": "Human Resources Team with access to HR & general assistant models"
+      },
+      {
+        "name": "role_security_admin",
+        "description": "Security Operations Center (SOC) Administrator"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "Engineering",
+      "path": "/Engineering",
+      "realmRoles": [
+        "role_dev"
+      ]
+    },
+    {
+      "name": "Finance_Department",
+      "path": "/Finance_Department",
+      "realmRoles": [
+        "role_finance"
+      ]
+    },
+    {
+      "name": "People_Operations",
+      "path": "/People_Operations",
+      "realmRoles": [
+        "role_hr"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "litellm-proxy",
+      "name": "LiteLLM AI Security Gateway",
+      "description": "OIDC client for AI Gateway token verification and RBAC",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "litellm-client-secret-xyz987",
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "redirectUris": [
+        "http://localhost:4000/*",
+        "http://localhost:4000/callback"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "protocolMappers": [
+        {
+          "name": "department",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "department",
+            "claim.name": "department",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "multivalued": "false"
+          }
+        },
+        {
+          "name": "cost_center",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "cost_center",
+            "claim.name": "cost_center",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "multivalued": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "alice.dev",
+      "enabled": true,
+      "email": "alice.dev@company.local",
+      "firstName": "Alice",
+      "lastName": "DevOps",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "DevPassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "role_dev"
+      ],
+      "groups": [
+        "/Engineering"
+      ],
+      "attributes": {
+        "department": [
+          "Engineering"
+        ],
+        "cost_center": [
+          "CC-ENG-401"
+        ],
+        "max_token_budget_daily": [
+          "100000"
+        ]
+      }
+    },
+    {
+      "username": "bob.finance",
+      "enabled": true,
+      "email": "bob.finance@company.local",
+      "firstName": "Bob",
+      "lastName": "Financial",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "FinancePassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "role_finance"
+      ],
+      "groups": [
+        "/Finance_Department"
+      ],
+      "attributes": {
+        "department": [
+          "Finance"
+        ],
+        "cost_center": [
+          "CC-FIN-102"
+        ],
+        "max_token_budget_daily": [
+          "50000"
+        ]
+      }
+    },
+    {
+      "username": "carol.hr",
+      "enabled": true,
+      "email": "carol.hr@company.local",
+      "firstName": "Carol",
+      "lastName": "PeopleOps",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "HRPassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "role_hr"
+      ],
+      "groups": [
+        "/People_Operations"
+      ],
+      "attributes": {
+        "department": [
+          "Human Resources"
+        ],
+        "cost_center": [
+          "CC-HR-809"
+        ],
+        "max_token_budget_daily": [
+          "30000"
+        ]
+      }
+    },
+    {
+      "username": "mallory.attacker",
+      "enabled": true,
+      "email": "mallory.attacker@company.local",
+      "firstName": "Mallory",
+      "lastName": "RogueUser",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "RoguePassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "role_hr"
+      ],
+      "groups": [
+        "/People_Operations"
+      ],
+      "attributes": {
+        "department": [
+          "Contractor"
+        ],
+        "cost_center": [
+          "CC-CONTRACT-999"
+        ],
+        "max_token_budget_daily": [
+          "10000"
+        ]
+      }
+    }
+  ]
+}
