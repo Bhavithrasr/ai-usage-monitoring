@@ -1,0 +1,86 @@
+# ==============================================================================
+# LiteLLM AI Gateway Configuration
+# Enterprise RBAC, Model Routing, Cost Tracking & SIEM Audit Hooks
+# ==============================================================================
+
+model_list:
+  # ----------------------------------------------------------------------------
+  # 1. Engineering Model (Restricted to Dev Role)
+  # ----------------------------------------------------------------------------
+  - model_name: dev-code-llm
+    litellm_params:
+      model: openai/dev-code-llm
+      api_base: os.environ/MOCK_AI_API_BASE
+      api_key: "mock-internal-key"
+      rpm: 100
+      tpm: 200000
+    model_info:
+      description: "Restricted engineering model for code generation and infrastructure analysis"
+      department_access: ["Engineering"]
+      risk_tier: "Tier-2 Restricted"
+
+  # ----------------------------------------------------------------------------
+  # 2. Financial Model (Restricted to Finance Role)
+  # ----------------------------------------------------------------------------
+  - model_name: financial-analyzer-llm
+    litellm_params:
+      model: openai/financial-analyzer-llm
+      api_base: os.environ/MOCK_AI_API_BASE
+      api_key: "mock-internal-key"
+      rpm: 60
+      tpm: 100000
+    model_info:
+      description: "Confidential financial forecasting and balance sheet auditing model"
+      department_access: ["Finance"]
+      risk_tier: "Tier-1 Confidential"
+
+  # ----------------------------------------------------------------------------
+  # 3. People Ops & General Assistant (Accessible by HR and general staff)
+  # ----------------------------------------------------------------------------
+  - model_name: hr-assistant-llm
+    litellm_params:
+      model: openai/hr-assistant-llm
+      api_base: os.environ/MOCK_AI_API_BASE
+      api_key: "mock-internal-key"
+      rpm: 120
+      tpm: 150000
+    model_info:
+      description: "HR policy advisor, talent acquisition, and internal communication model"
+      department_access: ["Human Resources", "Engineering", "Finance"]
+      risk_tier: "Tier-3 Standard"
+
+litellm_settings:
+  # Logging & Telemetry configuration
+  json_logs: true
+  set_verbose: false
+  telemetry: false
+  
+  # Audit log format & callbacks
+  # When running with Elasticsearch, logs are streamed to standard out in JSON format
+  # and ingested into Elasticsearch via the forwarder / collector.
+  callbacks: ["otel"]
+  
+  # Token counting & Budget tracking
+  max_budget: 1000.0  # USD equivalent ceiling
+  budget_duration: "30d"
+
+general_settings:
+  master_key: "sk-lab-master-key-admin-supersecret-9999"
+  # Database connection comes from the DATABASE_URL environment variable
+  # (.env for native runs via start_lab.ps1).
+  # Models come only from model_list above; the database stores virtual keys and spend.
+  store_model_in_db: false
+  allow_user_auth: true
+  enforce_user_param: true
+
+  # Identity & RBAC
+  # Users authenticate against Keycloak (realm ai-sec-realm, client litellm-proxy).
+  # Each user's Keycloak realm role is mapped to a per-user LiteLLM virtual key that
+  # is restricted to that role's models (see ROLE_MODELS in scripts/simulate_traffic.py),
+  # so the gateway itself rejects out-of-role model calls with HTTP 403.
+  # (LiteLLM's native JWT/OIDC validation is an Enterprise-only feature.)
+
+router_settings:
+  routing_strategy: "usage-based-routing"
+  num_retries: 2
+  timeout: 30
