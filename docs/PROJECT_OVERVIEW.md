@@ -65,13 +65,9 @@ ai-monitoring-lab/
 │   ├── kibana_dashboard.ndjson
 │   └── sentinel_workbook.json
 │
-├── docs/                     ← Reference documentation
-│   ├── ARCHITECTURE.md       ← System architecture + data flow diagrams
-│   └── PROJECT_OVERVIEW.md   ← This file
-│
-└── learning/                 ← Career and learning materials
-    ├── LEARNING_GUIDE.md
-    └── KNOWLEDGE_TRANSFER.md
+└── docs/                     ← Reference documentation
+    ├── ARCHITECTURE.md       ← System architecture + data flow diagrams
+    └── PROJECT_OVERVIEW.md   ← This file
 ```
 
 ---

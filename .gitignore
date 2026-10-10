@@ -48,3 +48,6 @@ config/mock_ai/Dockerfile
 scripts/sentinel_forwarder.py
 detections/rules_sentinel.kql
 dashboards/sentinel_workbook.json
+
+# Personal learning notes (kept locally, not published)
+learning/
