@@ -255,26 +255,6 @@ curl -s -u "elastic:$ELASTIC_PASSWORD" -X POST "http://localhost:9200/ai-audit-l
   }' | jq '.hits.hits[]._source | {user: .user.name, rule: .security.rule_name, severity: .security.severity}'
 ```
 
----
-
-## 📚 Dedicated Documentation & Knowledge Transfer
-
-This project includes two detailed reference documents located in the `learning/` directory:
-
-1. **[Learning Guide (`learning/LEARNING_GUIDE.md`)](learning/LEARNING_GUIDE.md)**:
-   - Career transformation: How Support Analyst competencies (ticket triage, root cause analysis, SLA management) translate directly into SOC Incident Response (NIST SP 800-61 / PICERL).
-   - In-depth theoretical exploration of **OWASP Top 10 for LLMs** with real-world enterprise analogies.
-   - Breakdown of the **MITRE ATLAS** taxonomy for adversarial machine learning.
-   - Enterprise AI governance standards: **EU AI Act**, **NIST AI RMF 1.0**, and **ISO/IEC 42001**.
-
-2. **[Knowledge Transfer & Operations Guide (`learning/KNOWLEDGE_TRANSFER.md`)](learning/KNOWLEDGE_TRANSFER.md)**:
-   - Complete technical walk-through with **every single inline command explained**.
-   - SOC Alert Triage Playbooks for all 8 threat detections.
-   - Troubleshooting guide for port bindings, memory allocations, and gateway connections.
-   - **Hard Cybersecurity Interview Questions & Answers** for presenting this project to hiring managers.
-
----
-
 ## 🗺️ Roadmap
 
 - **Docker Compose deployment** — one-command setup of the full stack.
