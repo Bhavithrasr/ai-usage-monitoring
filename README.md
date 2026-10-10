@@ -11,6 +11,8 @@
 > **Academic Context**: MSc in Cybersecurity  
 > **Career Target**: SOC Analyst | Detection Engineer | Cloud & AI Security Engineer
 
+![Kibana SOC dashboard: AI requests, detections, tokens and cost by department, model, OWASP LLM category and MITRE ATLAS technique](screenshots/05-kibana-dashboard.png)
+
 ---
 
 ## 📌 Executive Summary
@@ -85,6 +87,32 @@ All 8 detection rules are implemented as **Elastic Security** rules (`detections
 | **6** | **Credential & Secret Leakage in Prompts** | Developer accidentally pastes AWS keys (`AKIA...`), GitHub tokens (`ghp_...`), or private SSH keys into code prompts. | **LLM02**: Sensitive Information Disclosure | **AML.T0048**: Discover ML Artifacts / Exfiltration | **CRITICAL** |
 | **7** | **Off-Hours / Anomalous Usage Spike** | High-volume inference requests executed outside business hours (01:00 - 05:00 AM) or anomalous burst frequency. | **LLM06**: Insecure Authorization | **AML.T0012**: Valid Accounts (Account Takeover) | **MEDIUM** |
 | **8** | **Reconnaissance & Excessive Client Errors** | Attacker probes endpoint schemas and guardrails, generating an abnormal spike of 400 Bad Request / 403 Forbidden / 429 Rate Limits. | **LLM01**: Prompt Injection / **LLM04**: DoS | **AML.T0002**: ML Model Discovery / Reconnaissance | **MEDIUM** |
+
+---
+
+## 📸 Demo
+
+One live run: 4 Keycloak logins, 12 normal prompts and 8 attacks. The gateway blocked 2 out-of-role calls with HTTP 403, and the detection rules raised 10 alerts covering all 7 live attacks.
+
+### Simulation: Keycloak logins, role-scoped keys and real gateway blocks
+![Simulator output: personas log in through Keycloak, receive role-scoped gateway keys, and two out-of-role calls are blocked with HTTP 403](screenshots/04-simulation.png)
+
+### Security alerts raised by the 8 detection rules
+![Elastic Security Alerts page: 10 alerts, 3 critical, 2 high, 5 medium](screenshots/07-security-alerts.png)
+
+### Investigating an alert
+![Alert detail for an Unauthorized Model Access alert, with rule description, MITRE ATLAS mapping and the user involved](screenshots/08-alert-detail.png)
+
+### Detection rules: all 8 enabled and succeeding
+![Elastic Security Rules page listing the 8 AI Lab rules with risk score, severity and last-run status](screenshots/09-security-rules.png)
+
+### Identity, access and raw events
+
+| Keycloak users | Keycloak realm roles |
+| :---: | :---: |
+| ![Keycloak admin console listing alice.dev, bob.finance, carol.hr and mallory.attacker](screenshots/02-keycloak-users.png) | ![Keycloak realm roles role_dev, role_finance and role_hr](screenshots/03-keycloak-roles.png) |
+| **LiteLLM per-user virtual keys** | **Raw ECS events in Discover** |
+| ![LiteLLM Virtual Keys page with one key per persona](screenshots/10-litellm-keys.png) | ![Kibana Discover listing events with user, department, model, HTTP status and scenario](screenshots/06-discover-events.png) |
 
 ---
 
